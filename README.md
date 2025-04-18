@@ -80,7 +80,7 @@ for match in results:
 |-------------|------------------------------------------|
 | `{slot}`    | Placeholder to be replaced with values   |
 | `[optional]`| Optional word or phrase                  |
-| `(a|b|c)`   | Alternatives - only one is chosen        |
+| `(a\|b\|c)`   | Alternatives - only one is chosen        |
 
 ### Match Confidence
 
