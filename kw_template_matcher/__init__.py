@@ -1,9 +1,10 @@
 import itertools
 import re
 from collections import defaultdict
-from typing import List, Dict
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Dict, Tuple
 
-import rapidfuzz
+from rapidfuzz.distance import DamerauLevenshtein
 from simplematch import match as sm
 
 
@@ -28,7 +29,7 @@ class TemplateMatcher:
             if not slots:
                 continue
             t_name = slots[0]
-            self.templates[t_name].append(template)
+            self.templates[t_name] += expand_template(template)
 
     def match(self, query: str) -> List[Dict[str, str]]:
         """
@@ -38,17 +39,38 @@ class TemplateMatcher:
             query (str): The input query.
 
         Returns:
-            Slots: A dictionary with matched slots and confidence score.
+            List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
         """
-        matches = []
-        for ent, templates in self.templates.items():
+        return [m[1] for m in self.predict(query)]
+
+    def predict(self, query: str) -> List[Tuple[float, Dict[str, str]]]:
+        """
+        Matches the input query to a template.
+
+        Args:
+            query (str): The input query.
+
+        Returns:
+            List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
+        """
+
+        def match_template(ent_templates: Tuple[str, List[str]]) -> List[Tuple[float, Dict[str, str]]]:
+            ent, templates = ent_templates
+            result = []
             for t in templates:
                 m = sm(t, query)
                 if m:
-                    score = rapidfuzz.distance.DamerauLevenshtein.normalized_similarity(t, query)
-                    matches.append((score, m))
-        matches = sorted(matches, key=lambda k: k[0], reverse=True)
-        return [m[1] for m in matches]
+                    score = DamerauLevenshtein.normalized_similarity(t, query)
+                    result.append((score, m))
+            return result
+
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(match_template, self.templates.items())
+
+        matches = [item for sublist in results for item in sublist]
+        if matches:
+            matches.sort(key=lambda k: k[0], reverse=True)
+        return matches
 
 
 def expand_template(template: str) -> list[str]:
@@ -121,6 +143,17 @@ def expand_slots(template: str, slots: dict[str, list[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
+    matcher = TemplateMatcher()
+    matcher.add_templates([
+        "[hello, ](call me|my name is) {name}"
+    ])
+
+    query = "my name is Alice"
+    results = matcher.predict(query)
+
+    for score, match in results:
+        print(score, match)
+        # 0.7058823529411764 {'name': 'Alice'}
 
     template = "change [the ]brightness to {brightness_level} and color to {color_name}"
     slots = {
