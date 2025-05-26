@@ -24,14 +24,13 @@ class TemplateMatcher:
             templates (List[str]): A list of templates with slots.
         """
         for template in templates:
-            # Extract words within {curly_braces} using regex
-            slots = re.findall(r"\{(\w+)\}", template)
-            if not slots:
-                continue
-            t_name = slots[0]
-            self.templates[t_name] += expand_template(template)
+            expanded = expand_template(template)
+            for t in expanded:
+                slots = re.findall(r"\{(\w+)\}", t)
+                key = "|".join(sorted(slots)) or "__static__"
+                self.templates[key].append(t)
 
-    def match(self, query: str) -> List[Dict[str, str]]:
+    def match(self, query: str, threshold: float = 0.4) -> Dict[str, str]:
         """
         Matches the input query to a template.
 
@@ -41,9 +40,12 @@ class TemplateMatcher:
         Returns:
             List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
         """
-        return [m[1] for m in self.predict(query)]
+        preds = [m[1] for m in self.predict(query, threshold)]
+        if preds:
+            return preds[0]
+        return {}
 
-    def predict(self, query: str) -> List[Tuple[float, Dict[str, str]]]:
+    def predict(self, query: str, threshold: float = 0.4) -> List[Tuple[float, Dict[str, str]]]:
         """
         Matches the input query to a template.
 
@@ -61,7 +63,8 @@ class TemplateMatcher:
                 m = sm(t, query)
                 if m:
                     score = DamerauLevenshtein.normalized_similarity(t, query)
-                    result.append((score, m))
+                    if score >= threshold:
+                        result.append((score, m))
             return result
 
         with ThreadPoolExecutor() as executor:
@@ -145,10 +148,10 @@ def expand_slots(template: str, slots: dict[str, list[str]]) -> list[str]:
 if __name__ == "__main__":
     matcher = TemplateMatcher()
     matcher.add_templates([
-        "[hello, ](call me|my name is) {name}"
+        "[hello, ](call me|my name is) {name} [and] [I am from {location}]",
     ])
 
-    query = "my name is Alice"
+    query = "my name is Alice and I am from The United Kingdom"
     results = matcher.predict(query)
 
     for score, match in results:
