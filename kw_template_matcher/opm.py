@@ -17,25 +17,35 @@ class KeywordTemplateMatcher(IntentTransformer):
     def __init__(self, config=None):
         super().__init__("keyword-templates", 1, config)
         self.matchers = {}
+
+    def bind(self, bus):
+        super().bind(bus)
         self.bus.on('padatious:register_intent', self.handle_register_intent)
 
     def _unpack_object(self, message: Message):
         """convert message to training data"""
+        # standard info
+        sess = SessionManager.get(message)
         skill_id = message.data.get("skill_id") or message.context.get("skill_id")
         if not skill_id:
             skill_id = "anonymous_skill"
+        lang = message.data.get('lang') or sess.lang
+        lang = standardize_lang_tag(lang)
+
+        # intent specific
         file_name = message.data.get('file_name')
         samples = message.data.get("samples")
         name = message.data['name']
-        lang = message.data.get('lang', self.lang)
-        lang = standardize_lang_tag(lang)
         blacklisted_words = message.data.get('blacklisted_words', [])
         if (not file_name or not isfile(file_name)) and not samples:
             raise FileNotFoundError('Could not find file ' + file_name)
         if not samples and isfile(file_name):
             with open(file_name) as f:
                 samples = [line.strip() for line in f.readlines()]
+
+        # expand templates
         samples = deduplicate_list(flatten_list([expand_template(s) for s in samples]))
+
         return lang, skill_id, name, samples, blacklisted_words
 
     def handle_register_intent(self, message: Message):
@@ -45,6 +55,7 @@ class KeywordTemplateMatcher(IntentTransformer):
         if intent_name not in self.matchers[lang]:
             self.matchers[lang][intent_name] = TemplateMatcher()
         self.matchers[lang][intent_name].add_templates(samples)
+        LOG.debug(f"Registered {len(samples)} templates for {intent_name} ({lang})")
 
     def transform(self, intent: Union[IntentHandlerMatch, PipelineMatch]) -> Union[IntentHandlerMatch, PipelineMatch]:
         """
