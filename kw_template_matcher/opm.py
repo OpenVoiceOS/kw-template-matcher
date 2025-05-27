@@ -53,6 +53,8 @@ class KeywordTemplateMatcher(IntentTransformer):
 
     def handle_register_intent(self, message: Message):
         lang, _, intent_name, samples, _ = self._unpack_object(message)
+        if not samples:
+            return
         if lang not in self.matchers:
             self.matchers[lang] = {}
         if intent_name not in self.matchers[lang]:
