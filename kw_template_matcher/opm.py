@@ -15,12 +15,29 @@ from kw_template_matcher import TemplateMatcher
 
 class KeywordTemplateMatcher(IntentTransformer):
     def __init__(self, config=None):
+        """
+        Initializes the KeywordTemplateMatcher with support for dynamic intent registration.
+        
+        Sets up the matcher with the name "keyword-templates" and version 1, initializes
+        an empty dictionary for language-specific intent matchers, and registers an event
+        listener to handle intent registration messages.
+        """
         super().__init__("keyword-templates", 1, config)
         self.matchers = {}
         self.bus.on('padatious:register_intent', self.handle_register_intent)
 
     def _unpack_object(self, message: Message):
-        """convert message to training data"""
+        """
+        Extracts and processes training data for intent matching from a message.
+        
+        The method retrieves the skill ID, intent name, language, sample templates, and blacklisted words from the message. If samples are not provided, it attempts to read them from a specified file. The language tag is standardized, and sample templates are expanded, flattened, and deduplicated before returning.
+        
+        Returns:
+            A tuple containing the standardized language tag, skill ID, intent name, processed sample templates, and blacklisted words.
+        
+        Raises:
+            FileNotFoundError: If neither sample templates nor a valid file is provided.
+        """
         skill_id = message.data.get("skill_id") or message.context.get("skill_id")
         if not skill_id:
             skill_id = "anonymous_skill"
@@ -39,6 +56,11 @@ class KeywordTemplateMatcher(IntentTransformer):
         return lang, skill_id, name, samples, blacklisted_words
 
     def handle_register_intent(self, message: Message):
+        """
+        Registers a new intent's keyword templates for a specific language.
+        
+        Extracts language, intent name, and sample templates from the incoming message, then ensures a template matcher exists for the language and intent. Adds the provided templates to the matcher for future intent matching.
+        """
         lang, _, intent_name, samples, _ = self._unpack_object(message)
         if lang not in self.matchers:
             self.matchers[lang] = {}
@@ -48,8 +70,15 @@ class KeywordTemplateMatcher(IntentTransformer):
 
     def transform(self, intent: Union[IntentHandlerMatch, PipelineMatch]) -> Union[IntentHandlerMatch, PipelineMatch]:
         """
-        Optionally transform intent handler data
-        e.g. NER could be performed here by modifying intent.match_data
+        Attempts to match the intent's utterance against registered keyword templates and updates match data with extracted entities if a match is found.
+        
+        If a template matcher exists for the current session language and intent type, the utterance is matched against stored templates. Any entities extracted from the match are merged into the intent's match data.
+        
+        Args:
+            intent: The intent object containing the utterance and match data.
+        
+        Returns:
+            The intent object, potentially updated with additional entities from template matching.
         """
         sess = intent.updated_session or SessionManager.get()
         matchers = self.matchers.get(sess.lang)

@@ -18,10 +18,9 @@ class TemplateMatcher:
 
     def add_templates(self, templates: List[str]) -> None:
         """
-        Adds templates for matching, extracting slots from templates.
-
-        Args:
-            templates (List[str]): A list of templates with slots.
+        Adds template strings with slots to the matcher after expanding optional and alternative segments.
+        
+        Templates without any slots are ignored. Each template is expanded into all possible variants, and stored in groups keyed by their sorted slot names.
         """
         for template in templates:
             expanded = expand_template(template)
@@ -34,13 +33,14 @@ class TemplateMatcher:
 
     def match(self, query: str, threshold: float = 0.4) -> Dict[str, str]:
         """
-        Matches the input query to a template.
-
+        Finds the best matching template for the input query and returns its extracted slot values.
+        
         Args:
-            query (str): The input query.
-
+            query: The input text to match against templates.
+            threshold: Minimum similarity score required to consider a match.
+        
         Returns:
-            List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
+            A dictionary of slot names to extracted values from the highest scoring match, or an empty dictionary if no match meets the threshold.
         """
         preds = [m[1] for m in self.predict(query, threshold)]
         if preds:

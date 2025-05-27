@@ -32,7 +32,15 @@ def get_version():
 
 
 def required(requirements_file):
-    """ Read requirements file and remove comments and empty lines. """
+    """
+    Parses a requirements file, returning a list of non-comment, non-empty package requirements.
+    
+    Args:
+        requirements_file: Path to the requirements file relative to the base directory.
+    
+    Returns:
+        A list of package requirement strings, excluding comments and blank lines.
+    """
     with open(os.path.join(BASEDIR, requirements_file), 'r') as f:
         requirements = f.read().splitlines()
         return [pkg for pkg in requirements
