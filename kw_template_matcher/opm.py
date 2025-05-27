@@ -46,6 +46,9 @@ class KeywordTemplateMatcher(IntentTransformer):
         # expand templates
         samples = deduplicate_list(flatten_list([expand_template(s) for s in samples]))
 
+        # we only care about keyword extractors, drop the rest
+        samples = [s for s in samples if "{" in s]
+
         return lang, skill_id, name, samples, blacklisted_words
 
     def handle_register_intent(self, message: Message):
