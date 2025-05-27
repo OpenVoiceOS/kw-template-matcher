@@ -1,4 +1,4 @@
-# 🧩 TemplateMatcher
+# 🧩 KeywordTemplateMatcher
 
 A lightweight Python utility for expanding and matching natural language templates with **slots**, **optional phrases**, and **alternatives**. It supports fuzzy matching and slot extraction, making it ideal for prototyping NLU systems, voice assistants, or rule-based query matching.
 
@@ -82,9 +82,6 @@ for match in results:
 | `[optional]`| Optional word or phrase                  |
 | `(a\|b\|c)`   | Alternatives - only one is chosen        |
 
-### Match Confidence
-
-The `match()` method returns the best matches sorted by fuzzy confidence (`rapidfuzz.distance.DamerauLevenshtein.normalized_similarity`).
 
 ---
 

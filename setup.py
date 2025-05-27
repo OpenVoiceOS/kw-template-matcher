@@ -38,6 +38,8 @@ def required(requirements_file):
         return [pkg for pkg in requirements
                 if pkg.strip() and not pkg.startswith("#")]
 
+PLUGIN_ENTRY_POINT = 'ovos-keyword-template-matcher=kw_template_matcher.opm:KeywordTemplateMatcher'
+
 
 setup(
     name="keyword-template-matcher",
@@ -50,6 +52,7 @@ setup(
     url="https://github.com/TigreGotico/kw-template-matcher",  # Update with your repo URL
     packages=find_packages(),
     install_requires=required("requirements.txt"),
+    entry_points={'opm.transformer.intent': PLUGIN_ENTRY_POINT},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
