@@ -20,7 +20,7 @@ A lightweight Python utility for expanding and matching natural language templat
 ## 📦 Installation
 
 ```bash
-pip install rapidfuzz simplematch
+pip install keyword-template-matcher
 ```
 
 ---
