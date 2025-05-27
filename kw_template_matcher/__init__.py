@@ -27,7 +27,9 @@ class TemplateMatcher:
             expanded = expand_template(template)
             for t in expanded:
                 slots = re.findall(r"\{(\w+)\}", t)
-                key = "|".join(sorted(slots)) or "__static__"
+                if not slots:
+                    continue
+                key = "|".join(sorted(slots))
                 self.templates[key].append(t)
 
     def match(self, query: str, threshold: float = 0.4) -> Dict[str, str]:
@@ -156,7 +158,7 @@ if __name__ == "__main__":
 
     for score, match in results:
         print(score, match)
-        # 0.7058823529411764 {'name': 'Alice'}
+        # 0.5918367346938775 {'name': 'Alice', 'location': 'The United Kingdom'}
 
     template = "change [the ]brightness to {brightness_level} and color to {color_name}"
     slots = {
