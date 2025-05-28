@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TigreGotico/kw-template-matcher)
+
 # 🧩 KeywordTemplateMatcher
 
 A lightweight Python utility for expanding and matching natural language templates with **slots**, **optional phrases**, and **alternatives**. It supports fuzzy matching and slot extraction, making it ideal for prototyping NLU systems, voice assistants, or rule-based query matching.
