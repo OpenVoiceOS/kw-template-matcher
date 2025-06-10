@@ -2,7 +2,7 @@ from os.path import isfile
 
 from ovos_bus_client.message import Message
 from ovos_bus_client.session import SessionManager
-from ovos_plugin_manager.templates.pipeline import IntentHandlerMatch, PipelineMatch
+from ovos_plugin_manager.templates.pipeline import IntentHandlerMatch
 from ovos_plugin_manager.templates.transformers import IntentTransformer
 from ovos_utils.bracket_expansion import expand_template
 from ovos_utils.lang import standardize_lang_tag
@@ -62,7 +62,7 @@ class KeywordTemplateMatcher(IntentTransformer):
         self.matchers[lang][intent_name].add_templates(samples)
         LOG.debug(f"Registered {len(samples)} templates for {intent_name} ({lang})")
 
-    def transform(self, intent: Union[IntentHandlerMatch, PipelineMatch]) -> Union[IntentHandlerMatch, PipelineMatch]:
+    def transform(self, intent: IntentHandlerMatch) -> IntentHandlerMatch:
         """
         Optionally transform intent handler data
         e.g. NER could be performed here by modifying intent.match_data
