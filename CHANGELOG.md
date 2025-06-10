@@ -1,12 +1,12 @@
 # Changelog
 
-## [0.1.0a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.0a1) (2025-05-27)
+## [0.1.1a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.1a1) (2025-06-10)
 
-[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.0.2...0.1.0a1)
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.0...0.1.1a1)
 
 **Merged pull requests:**
 
-- feat:ovos plugin [\#1](https://github.com/TigreGotico/kw-template-matcher/pull/1) ([JarbasAl](https://github.com/JarbasAl))
+- fix: typing [\#4](https://github.com/TigreGotico/kw-template-matcher/pull/4) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
