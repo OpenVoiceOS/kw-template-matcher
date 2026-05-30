@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2a2](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a2) (2026-05-30)
+
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a1...0.1.2a2)
+
+**Merged pull requests:**
+
+- docs: add docs and runnable examples [\#12](https://github.com/TigreGotico/kw-template-matcher/pull/12) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.2a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a1) (2025-12-18)
 
 [Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.1...0.1.2a1)
