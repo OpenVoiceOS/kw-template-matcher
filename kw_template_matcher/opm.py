@@ -45,14 +45,22 @@ class KeywordTemplateMatcher(IntentTransformer):
 
         # expand templates, skipping malformed ones so a single bad line
         # never prevents the remaining samples from being registered
+        # (OVOS-INTENT-4 §6.3); each skip is logged with the §5.3 fields
+        ctx = (f"[skill_id={skill_id!r} name={name!r} lang={lang!r} "
+               f"topic={message.msg_type}]")
         expanded = []
+        skipped = False
         for s in samples:
             try:
                 expanded.append(expand(s))
             except Exception as e:
-                LOG.warning(f"Skipping malformed template for intent "
-                            f"'{name}' ({skill_id}): {s!r} ({e})")
+                LOG.warning(f"skipping malformed template {s!r}: {e} {ctx}")
+                skipped = True
         samples = deduplicate_list(flatten_list(expanded))
+        if skipped and not samples:
+            # zero valid templates -> the whole registration is malformed
+            LOG.warning(f"rejecting registration: no valid template "
+                        f"remains {ctx}")
 
         # we only care about keyword extractors, drop the rest
         samples = [s for s in samples if "{" in s]

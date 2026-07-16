@@ -6,6 +6,7 @@ markers).  A single bad line must never abort intent registration for
 the remaining samples.
 """
 import unittest
+from unittest.mock import patch
 
 from ovos_bus_client.message import Message
 
@@ -54,6 +55,44 @@ class TestUnpackObject(unittest.TestCase):
     def test_all_malformed_yields_empty(self):
         expanded = self.unpack(["{Medien}", "{a}{b}", "{oops"])
         self.assertEqual(expanded, [])
+
+
+class TestWarnLogFields(unittest.TestCase):
+    """Skip and rejection WARNs carry the OVOS-INTENT-4 §5.3 fields."""
+
+    def setUp(self):
+        self.plugin = KeywordTemplateMatcher()
+
+    def test_skip_warn_carries_fields(self):
+        with patch("kw_template_matcher.opm.LOG.warning") as warn:
+            self.plugin._unpack_object(make_message(
+                ["play {Medien}", "play {media}"]))
+        skips = [c[0][0] for c in warn.call_args_list
+                 if "skipping malformed template" in c[0][0]]
+        self.assertEqual(len(skips), 1)
+        log = skips[0]
+        self.assertIn("play {Medien}", log)
+        self.assertIn("'test_skill'", log)
+        self.assertIn("test_skill:demo.intent", log)
+        self.assertIn("en-US", log)
+        self.assertIn("padatious:register_intent", log)
+
+    def test_all_malformed_logs_rejection(self):
+        with patch("kw_template_matcher.opm.LOG.warning") as warn:
+            _, _, _, samples, _ = self.plugin._unpack_object(make_message(
+                ["{Medien}", "{oops", "{a}{b}"]))
+        self.assertEqual(samples, [])
+        rejection = warn.call_args_list[-1][0][0]
+        self.assertIn("rejecting registration", rejection)
+        self.assertIn("no valid template remains", rejection)
+        self.assertIn("'test_skill'", rejection)
+        self.assertIn("en-US", rejection)
+
+    def test_valid_only_no_warn(self):
+        with patch("kw_template_matcher.opm.LOG.warning") as warn:
+            self.plugin._unpack_object(make_message(["play {media}"]))
+        for c in warn.call_args_list:
+            self.assertNotIn("template", c[0][0])
 
 
 class TestHandleRegisterIntent(unittest.TestCase):
