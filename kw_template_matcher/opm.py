@@ -4,7 +4,7 @@ from ovos_bus_client.message import Message
 from ovos_bus_client.session import SessionManager
 from ovos_plugin_manager.templates.pipeline import IntentHandlerMatch
 from ovos_plugin_manager.templates.transformers import IntentTransformer
-from ovos_utils.bracket_expansion import expand_template
+from ovos_spec_tools.expansion import expand
 from ovos_utils.lang import standardize_lang_tag
 from ovos_utils.list_utils import deduplicate_list, flatten_list
 from ovos_utils.log import LOG
@@ -43,8 +43,16 @@ class KeywordTemplateMatcher(IntentTransformer):
             with open(file_name) as f:
                 samples = [line.strip() for line in f.readlines()]
 
-        # expand templates
-        samples = deduplicate_list(flatten_list([expand_template(s) for s in samples]))
+        # expand templates, skipping malformed ones so a single bad line
+        # never prevents the remaining samples from being registered
+        expanded = []
+        for s in samples:
+            try:
+                expanded.append(expand(s))
+            except Exception as e:
+                LOG.warning(f"Skipping malformed template for intent "
+                            f"'{name}' ({skill_id}): {s!r} ({e})")
+        samples = deduplicate_list(flatten_list(expanded))
 
         # we only care about keyword extractors, drop the rest
         samples = [s for s in samples if "{" in s]

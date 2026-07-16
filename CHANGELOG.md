@@ -1,12 +1,28 @@
 # Changelog
 
-## [0.1.1a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.1a1) (2025-06-10)
+## [0.1.3a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.3a1) (2026-07-16)
 
-[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.0...0.1.1a1)
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a2...0.1.3a1)
 
 **Merged pull requests:**
 
-- fix: typing [\#4](https://github.com/TigreGotico/kw-template-matcher/pull/4) ([JarbasAl](https://github.com/JarbasAl))
+- fix: skip malformed templates during intent registration [\#15](https://github.com/TigreGotico/kw-template-matcher/pull/15) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.1.2a2](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a2) (2026-05-30)
+
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a1...0.1.2a2)
+
+**Merged pull requests:**
+
+- docs: add docs and runnable examples [\#12](https://github.com/TigreGotico/kw-template-matcher/pull/12) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.1.2a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a1) (2025-12-18)
+
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.1...0.1.2a1)
+
+**Merged pull requests:**
+
+- chore: Configure Renovate [\#6](https://github.com/TigreGotico/kw-template-matcher/pull/6) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
