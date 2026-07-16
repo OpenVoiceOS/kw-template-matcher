@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.3a1) (2026-07-16)
+
+[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a2...0.1.3a1)
+
+**Merged pull requests:**
+
+- fix: skip malformed templates during intent registration [\#15](https://github.com/TigreGotico/kw-template-matcher/pull/15) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.2a2](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a2) (2026-05-30)
 
 [Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a1...0.1.2a2)
