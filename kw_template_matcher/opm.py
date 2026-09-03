@@ -5,6 +5,7 @@ from ovos_bus_client.session import SessionManager
 from ovos_plugin_manager.templates.pipeline import IntentHandlerMatch
 from ovos_plugin_manager.templates.transformers import IntentTransformer
 from ovos_spec_tools.expansion import expand
+from ovos_spec_tools.messages import SpecMessage
 from ovos_utils.lang import standardize_lang_tag
 from ovos_utils.list_utils import deduplicate_list, flatten_list
 from ovos_utils.log import LOG
@@ -21,8 +22,11 @@ class KeywordTemplateMatcher(IntentTransformer):
     def bind(self, bus):
         super().bind(bus)
         self.bus.on('padatious:register_intent', self.handle_register_intent)
+        self.bus.on(SpecMessage.INTENT_REGISTER_TEMPLATE.value,
+                    self.handle_register_template)
 
-    def _unpack_object(self, message: Message):
+    def _unpack_object(self, message: Message, name_key: str = 'name',
+                        blacklist_key: str = 'blacklisted_words'):
         """convert message to training data"""
         # standard info
         sess = SessionManager.get(message)
@@ -35,9 +39,16 @@ class KeywordTemplateMatcher(IntentTransformer):
         # intent specific
         file_name = message.data.get('file_name')
         samples = message.data.get("samples")
-        name = message.data['name']
-        blacklisted_words = message.data.get('blacklisted_words', [])
-        if (not file_name or not isfile(file_name)) and not samples:
+        name = message.data[name_key]
+        blacklisted_words = message.data.get(blacklist_key, [])
+        if not samples and not file_name:
+            # no samples and no file to load them from -> no-op registration
+            # (INTENT-4 §6.3), never a crash
+            LOG.warning(f"no samples to register for {name!r} "
+                        f"(skill_id={skill_id!r} lang={lang!r} "
+                        f"topic={message.msg_type})")
+            return lang, skill_id, name, [], blacklisted_words
+        if not samples and (not file_name or not isfile(file_name)):
             raise FileNotFoundError('Could not find file ' + file_name)
         if not samples and isfile(file_name):
             with open(file_name) as f:
@@ -67,16 +78,28 @@ class KeywordTemplateMatcher(IntentTransformer):
 
         return lang, skill_id, name, samples, blacklisted_words
 
-    def handle_register_intent(self, message: Message):
-        lang, _, intent_name, samples, _ = self._unpack_object(message)
+    def _register(self, lang: str, match_type: str, samples: list):
         if not samples:
             return
         if lang not in self.matchers:
             self.matchers[lang] = {}
-        if intent_name not in self.matchers[lang]:
-            self.matchers[lang][intent_name] = TemplateMatcher()
-        self.matchers[lang][intent_name].add_templates(samples)
-        LOG.debug(f"Registered {len(samples)} templates for {intent_name} ({lang})")
+        if match_type not in self.matchers[lang]:
+            self.matchers[lang][match_type] = TemplateMatcher()
+        self.matchers[lang][match_type].add_templates(samples)
+        LOG.debug(f"Registered {len(samples)} templates for {match_type} ({lang})")
+
+    def handle_register_intent(self, message: Message):
+        # legacy padatious topic, match_type is the bare intent_name
+        # (padatious matches are looked up by that same name)
+        lang, _, intent_name, samples, _ = self._unpack_object(message)
+        self._register(lang, intent_name, samples)
+
+    def handle_register_template(self, message: Message):
+        # OVOS-INTENT-4 §6 spec topic, match_type follows m2v's
+        # "skill_id:intent_name" IntentHandlerMatch.match_type convention
+        lang, skill_id, intent_name, samples, _ = self._unpack_object(
+            message, name_key='intent_name', blacklist_key='blacklist')
+        self._register(lang, f"{skill_id}:{intent_name}", samples)
 
     def transform(self, intent: IntentHandlerMatch) -> IntentHandlerMatch:
         """
