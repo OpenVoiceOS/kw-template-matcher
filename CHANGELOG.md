@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.6a1) (2026-09-03)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.5a1...0.1.6a1)
+
+**Merged pull requests:**
+
+- fix: package with pyproject.toml so the sdist builds [\#27](https://github.com/OpenVoiceOS/kw-template-matcher/pull/27) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.5a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.5a1) (2026-09-03)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.4a3...0.1.5a1)
