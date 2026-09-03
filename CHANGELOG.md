@@ -1,28 +1,44 @@
 # Changelog
 
-## [0.1.3a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.3a1) (2026-07-16)
+## [0.1.6a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.6a1) (2026-09-03)
 
-[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a2...0.1.3a1)
-
-**Merged pull requests:**
-
-- fix: skip malformed templates during intent registration [\#15](https://github.com/TigreGotico/kw-template-matcher/pull/15) ([JarbasAl](https://github.com/JarbasAl))
-
-## [0.1.2a2](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a2) (2026-05-30)
-
-[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.2a1...0.1.2a2)
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.5a1...0.1.6a1)
 
 **Merged pull requests:**
 
-- docs: add docs and runnable examples [\#12](https://github.com/TigreGotico/kw-template-matcher/pull/12) ([JarbasAl](https://github.com/JarbasAl))
+- fix: package with pyproject.toml so the sdist builds [\#27](https://github.com/OpenVoiceOS/kw-template-matcher/pull/27) ([JarbasAl](https://github.com/JarbasAl))
 
-## [0.1.2a1](https://github.com/TigreGotico/kw-template-matcher/tree/0.1.2a1) (2025-12-18)
+## [0.1.5a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.5a1) (2026-09-03)
 
-[Full Changelog](https://github.com/TigreGotico/kw-template-matcher/compare/0.1.1...0.1.2a1)
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.4a3...0.1.5a1)
 
 **Merged pull requests:**
 
-- chore: Configure Renovate [\#6](https://github.com/TigreGotico/kw-template-matcher/pull/6) ([renovate[bot]](https://github.com/apps/renovate))
+- fix: register templates from ovos.intent.register.template and key by skill\_id:intent\_name [\#24](https://github.com/OpenVoiceOS/kw-template-matcher/pull/24) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.1.4a3](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.4a3) (2026-09-01)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.4a2...0.1.4a3)
+
+**Merged pull requests:**
+
+- docs: rewrite README in Simplified Technical English [\#20](https://github.com/OpenVoiceOS/kw-template-matcher/pull/20) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.1.4a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.4a2) (2026-08-02)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.4a1...0.1.4a2)
+
+**Merged pull requests:**
+
+- ci: migrate release workflow to shared OpenVoiceOS automations [\#21](https://github.com/OpenVoiceOS/kw-template-matcher/pull/21) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.1.4a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.4a1) (2026-07-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.3...0.1.4a1)
+
+**Merged pull requests:**
+
+- fix: log skipped templates with full registration identifiers [\#17](https://github.com/OpenVoiceOS/kw-template-matcher/pull/17) ([JarbasAl](https://github.com/JarbasAl))
 
 
 

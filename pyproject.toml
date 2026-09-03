@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keyword-template-matcher"
+dynamic = ["version"]
+description = "A lightweight Python utility for template expansion and matching with slots and fuzzy matching."
+license = { text = "MIT" }
+readme = "README.md"
+authors = [
+    { name = "JarbasAI", email = "jarbasai@mailfence.com" },
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "rapidfuzz",
+    "simplematch",
+    "ovos-spec-tools>=1.4.0a1",
+    "ovos-bus-client>=2.11.1a1",
+    "ovos-plugin-manager>=2.11.6a1",
+    "ovos-utils>=0.14.0a1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[project.urls]
+Homepage = "https://github.com/OpenVoiceOS/kw-template-matcher"
+
+[project.entry-points."opm.transformer.intent"]
+ovos-keyword-template-matcher = "kw_template_matcher.opm:KeywordTemplateMatcher"
+
+[tool.setuptools.dynamic]
+version = { attr = "kw_template_matcher.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kw_template_matcher*"]
