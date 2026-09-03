@@ -30,7 +30,8 @@ class TemplateMatcher:
                 if not slots:
                     continue
                 key = "|".join(sorted(slots))
-                self.templates[key].append(t)
+                if t not in self.templates[key]:
+                    self.templates[key].append(t)
 
     def match(self, query: str, threshold: float = 0.4) -> Dict[str, str]:
         """
