@@ -4,7 +4,6 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Tuple
 
-from rapidfuzz.distance import DamerauLevenshtein
 from simplematch import match as sm
 
 
@@ -52,6 +51,15 @@ class TemplateMatcher:
         """
         Matches the input query to a template.
 
+        `threshold` is kept for backwards compatibility but no longer filters matches:
+        every template match returned by `simplematch` is structurally exact, so it is
+        always accepted regardless of the literal/utterance length ratio. When multiple
+        templates match, the one with more literal tokens wins the tie-break even if that
+        means a shared leading article ends up on the wrong side of the split: with both
+        `'play {query}'` and `'play the {thing}'` registered, `"play the beatles"` is
+        matched by the latter and returns `{"thing": "beatles"}`, not `{"query": "the
+        beatles"}`.
+
         Args:
             query (str): The input query.
 
@@ -65,9 +73,18 @@ class TemplateMatcher:
             for t in templates:
                 m = sm(t, query)
                 if m:
-                    score = DamerauLevenshtein.normalized_similarity(t, query)
-                    if score >= threshold:
-                        result.append((score, m))
+                    # `sm` only returns a hit for a structurally exact match (every literal
+                    # token in the template is present in the query), so this is never a
+                    # fuzzy/approximate match and must not be discarded by `threshold`, which
+                    # was comparing the raw template literal (e.g. "play {query}") against the
+                    # whole utterance and dropping correct extractions whenever the slot value
+                    # was long relative to the template. When several templates match the same
+                    # query, rank them by the fraction of literal (non-slot) tokens they
+                    # contain: the template that pins down more of the utterance in literal
+                    # words is the more specific/confident match.
+                    tokens = t.split()
+                    literal_tokens = sum(1 for tok in tokens if not re.fullmatch(r"\{\w+\}", tok))
+                    result.append((float(literal_tokens), m))
             return result
 
         with ThreadPoolExecutor() as executor:
