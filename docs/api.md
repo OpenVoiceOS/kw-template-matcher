@@ -83,9 +83,12 @@ Returns the slot dict of the single highest-scoring template, or `{}` if no
 template clears the threshold.
 
 ```python
-matcher.match("play jazz in kitchen")
+matcher.match("play jazz in kitchen", threshold=0.3)
 # {'query': 'jazz', 'device_name': 'kitchen'}
 ```
+
+The default `threshold=0.4` is stricter than this example's own similarity score, so this
+call must lower it. Passing no `threshold` override here returns `{}`.
 
 ### `predict(query: str, threshold: float = 0.4) -> list[tuple[float, dict[str, str]]]`
 
@@ -99,9 +102,10 @@ descending score. `match` is `predict(...)[0][1]` when the list is not empty.
 - **threshold**: minimum score to keep a candidate. Default `0.4`.
 
 ```python
-for score, slots in matcher.predict("play jazz in kitchen"):
+for score, slots in matcher.predict("play jazz in kitchen", threshold=0.3):
     print(round(score, 3), slots)
-# 0.65 {'query': 'jazz', 'device_name': 'kitchen'}
+# 0.379 {'query': 'jazz', 'device_name': 'kitchen'}
+# 0.37 {'query': 'jazz', 'zone_name': 'kitchen'}
 ```
 
 A query that fills no slot structurally returns `[]` from `predict` and `{}`
