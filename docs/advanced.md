@@ -25,7 +25,7 @@ matcher = TemplateMatcher()
 matcher.add_templates(["set a timer for {duration}"])
 for score, slots in matcher.predict("set a timer for five minutes"):
     print(round(score, 3), slots)
-# 0.5 {'duration': 'five minutes'}
+# 0.607 {'duration': 'five minutes'}
 ```
 
 ## Tuning the threshold
@@ -34,7 +34,7 @@ The default `0.4` is permissive. Raise it to match only near-literal
 phrasings. Lower it to allow longer slot fills and looser wording.
 
 ```python
-matcher.predict("set a timer for five minutes", threshold=0.6)  # likely []
+matcher.predict("set a timer for five minutes", threshold=0.7)  # []
 matcher.predict("set a timer for five minutes", threshold=0.2)  # keeps the match
 ```
 
