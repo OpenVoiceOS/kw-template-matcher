@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.7a2) (2026-09-07)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.7a1...0.1.7a2)
+
+**Merged pull requests:**
+
+- ci: run unit tests on pull requests [\#34](https://github.com/OpenVoiceOS/kw-template-matcher/pull/34) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.7a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.7a1) (2026-09-07)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.6a1...0.1.7a1)
