@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.7a1) (2026-09-07)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.6a1...0.1.7a1)
+
+**Merged pull requests:**
+
+- fix: honour per-slot value blacklists when refilling slots [\#32](https://github.com/OpenVoiceOS/kw-template-matcher/pull/32) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.6a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.6a1) (2026-09-03)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.5a1...0.1.6a1)
