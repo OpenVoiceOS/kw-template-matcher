@@ -1,35 +1,33 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TigreGotico/kw-template-matcher)
 
-# 🧩 KeywordTemplateMatcher
+# KeywordTemplateMatcher
 
-A lightweight Python utility for expanding and matching natural language templates with **slots**, **optional phrases**, and **alternatives**. It supports fuzzy matching and slot extraction, making it ideal for prototyping NLU systems, voice assistants, or rule-based query matching.
+KeywordTemplateMatcher is a Python library for natural language templates. A
+template can hold slots, optional phrases, and alternatives. The library
+expands a template into every sentence it describes, and matches an utterance
+back to the slot values it filled. Use it to prototype NLU systems, voice
+assistants, or rule-based query matching.
 
----
+## Features
 
-## 🔧 Features
-
-- ✅ Template expansion with:
+- Template expansion with:
     - Optional phrases (`[optional]`)
     - Alternatives (`(choice1|choice2)`)
     - Slots (`{slot_name}`)
-- ✅ Slot substitution with provided dictionaries
-- ✅ Fuzzy matching with confidence scoring using `rapidfuzz`
-- ✅ Simple template structure, extensible for any language/grammar rules
-- ✅ Built-in integration with `simplematch` for fuzzy slot matching
+- Slot substitution from a supplied dictionary
+- Fuzzy matching and confidence scoring with `rapidfuzz`
+- A simple template structure that extends to any language or grammar rule
+- Built-in integration with `simplematch` for fuzzy slot matching
 
----
-
-## 📦 Installation
+## Installation
 
 ```bash
 pip install keyword-template-matcher
 ```
 
----
+## Usage
 
-## 🚀 Usage
-
-### 1. Expanding a Template with Slots
+### 1. Expand a template with slots
 
 ```python
 from kw_template_matcher import expand_slots
@@ -52,9 +50,7 @@ change brightness to high and color to blue
 ... (all combinations)
 ```
 
----
-
-### 2. Template Matching
+### 2. Match a template
 
 ```python
 from kw_template_matcher import TemplateMatcher
@@ -72,11 +68,9 @@ for match in results:
     print(match)
 ```
 
----
+## How it works
 
-## 🧠 How It Works
-
-### Template Syntax
+### Template syntax
 
 | Syntax      | Description                              |
 |-------------|------------------------------------------|
@@ -84,10 +78,7 @@ for match in results:
 | `[optional]`| Optional word or phrase                  |
 | `(a\|b\|c)`   | Alternatives - only one is chosen        |
 
-
----
-
-## 🧪 Test Example Templates
+### Test example templates
 
 ```python
 templates = [
@@ -97,7 +88,7 @@ templates = [
 ]
 ```
 
-Produces expansions like:
+These templates expand to sentences like:
 
 ```
 - call me {name}
@@ -107,15 +98,15 @@ Produces expansions like:
 - play {query} in {device_name}
 ```
 
----
+## Related projects
 
-## 🤝 Contributions
+- [OpenVoiceOS/simplematch](https://github.com/OpenVoiceOS/simplematch) - the lightweight template parser this library builds on
 
-PRs, issues, and suggestions welcome! Feel free to open an issue or submit a pull request if you'd like to improve the matcher.
+## Contributions
 
----
+Open an issue or submit a pull request to report a bug or propose an improvement.
 
-## 💬 Acknowledgements
+## Acknowledgements
 
 - [`rapidfuzz`](https://github.com/maxbachmann/RapidFuzz) for fast fuzzy matching
 - [`simplematch`](https://github.com/OpenVoiceOS/simplematch) for lightweight template parsing

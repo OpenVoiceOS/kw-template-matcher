@@ -8,9 +8,9 @@ from kw_template_matcher import TemplateMatcher, expand_template, expand_slots
 
 ## `expand_template(template: str) -> list[str]`
 
-Expand `[optional]` and `(a|b)` syntax into the full sorted list of concrete
-sentences. `{slot}` markers are preserved verbatim. The result is sorted and
-de-duplicated.
+Expands `[optional]` and `(a|b)` syntax into the full sorted list of concrete
+sentences. `{slot}` markers stay verbatim in each sentence. The result is
+sorted and de-duplicated.
 
 ```python
 from kw_template_matcher import expand_template
@@ -32,15 +32,16 @@ expand_template("[(this|that) is optional]")
 
 ## `expand_slots(template: str, slots: dict[str, list[str]]) -> list[str]`
 
-Run `expand_template` first, then substitute each `{slot}` with every value from
-`slots`, producing the Cartesian product. A slot with no entry in the dict is
-left as its `{name}` literal.
+Runs `expand_template` first, then substitutes each `{slot}` with every value
+from `slots`, producing the Cartesian product. A slot with no entry in the
+dict stays as its `{name}` literal.
 
-- **template** — the template string.
-- **slots** — `{slot_name: [value, ...]}`.
+- **template**: the template string.
+- **slots**: `{slot_name: [value, ...]}`.
 
-Returns one string per (expansion x slot-value) combination. Order follows the
-sorted expansion order, then `itertools.product` over the slot values.
+Returns one string per expansion and slot-value combination. The order
+follows the sorted expansion order, then `itertools.product` over the slot
+values.
 
 ```python
 from kw_template_matcher import expand_slots
@@ -62,9 +63,9 @@ sorted, `|`-joined slot names of each expanded template.
 
 ### `add_templates(templates: list[str]) -> None`
 
-Expand each template and register every expansion **that contains at least one
-slot**. Slot-free expansions are dropped — the matcher only routes utterances
-that fill named holes.
+Expands each template and registers every expansion that contains at least
+one slot. It drops slot-free expansions, because the matcher only routes
+utterances that fill named holes.
 
 ```python
 from kw_template_matcher import TemplateMatcher
@@ -78,8 +79,8 @@ matcher.add_templates([
 
 ### `match(query: str, threshold: float = 0.4) -> dict[str, str]`
 
-Return the slot dict of the single highest-scoring template, or `{}` if nothing
-clears the threshold.
+Returns the slot dict of the single highest-scoring template, or `{}` if no
+template clears the threshold.
 
 ```python
 matcher.match("play jazz in kitchen")
@@ -88,14 +89,14 @@ matcher.match("play jazz in kitchen")
 
 ### `predict(query: str, threshold: float = 0.4) -> list[tuple[float, dict[str, str]]]`
 
-Return every template that both structurally matches (via `simplematch`) and
-scores at or above `threshold`, as `(score, slots)` tuples sorted by descending
-score. `match` is `predict(...)[0][1]` when non-empty.
+Returns every template that structurally matches (via `simplematch`) and
+scores at or above `threshold`, as `(score, slots)` tuples sorted by
+descending score. `match` is `predict(...)[0][1]` when the list is not empty.
 
-- **score** — `rapidfuzz` normalized Damerau-Levenshtein similarity between the
+- **score**: `rapidfuzz` normalized Damerau-Levenshtein similarity between the
   template string and the query, in `[0.0, 1.0]`. Longer literal overlap and
   fewer edits score higher.
-- **threshold** — minimum score to keep a candidate. Default `0.4`.
+- **threshold**: minimum score to keep a candidate. Default `0.4`.
 
 ```python
 for score, slots in matcher.predict("play jazz in kitchen"):
@@ -106,8 +107,5 @@ for score, slots in matcher.predict("play jazz in kitchen"):
 A query that fills no slot structurally returns `[]` from `predict` and `{}`
 from `match`.
 
-## Where next
-
-- [quickstart.md](quickstart.md) — install and the core idea
-- [advanced.md](advanced.md) — scoring intuition, thresholds, gotchas
-- [opm-plugin.md](opm-plugin.md) — the OVOS plugin built on `TemplateMatcher`
+---
+[← Quickstart](quickstart.md) · [Home](../README.md) · [Advanced →](advanced.md)
