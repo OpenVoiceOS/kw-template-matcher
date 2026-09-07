@@ -194,5 +194,65 @@ class TestEmptySamplesNoCrash(unittest.TestCase):
                          self.plugin.matchers.get("en-US", {}))
 
 
+class TestSlotBlacklist(unittest.TestCase):
+    """OVOS-INTENT-2 §4.3 — a value listed in a slot's blacklist must not be
+    bound to that slot, so a slot the matching engine left unresolved stays
+    unresolved instead of being refilled with an anaphoric pronoun."""
+
+    def setUp(self):
+        self.plugin = KeywordTemplateMatcher()
+
+    def test_legacy_topic_blacklisted_value_not_bound(self):
+        msg = make_message(["spell {word}"], name="spell_skill:Spell")
+        msg.data["slot_blacklist"] = {"word": ["it", "this", "them"]}
+        self.plugin.handle_register_intent(msg)
+        result = self.plugin.transform(match("spell_skill:Spell", "spell it"))
+        self.assertIsNone(result.match_data.get("word"))
+
+    def test_spec_topic_dict_blacklist_not_bound(self):
+        msg = make_template_message(["spell {word}"], intent_name="Spell")
+        msg.data["blacklist"] = {"word": ["it"]}
+        self.plugin.handle_register_template(msg)
+        result = self.plugin.transform(match("m2v_skill:Spell", "spell it"))
+        self.assertIsNone(result.match_data.get("word"))
+
+    def test_non_blacklisted_value_still_bound(self):
+        msg = make_message(["spell {word}"], name="spell_skill:Spell")
+        msg.data["slot_blacklist"] = {"word": ["it"]}
+        self.plugin.handle_register_intent(msg)
+        result = self.plugin.transform(match("spell_skill:Spell",
+                                             "spell aardvark"))
+        self.assertEqual(result.match_data.get("word"), "aardvark")
+
+    def test_blacklist_matches_whole_value_only(self):
+        # a value that merely contains a blacklisted word is legitimate
+        msg = make_message(["spell {word}"], name="spell_skill:Spell")
+        msg.data["slot_blacklist"] = {"word": ["it"]}
+        self.plugin.handle_register_intent(msg)
+        result = self.plugin.transform(match("spell_skill:Spell",
+                                             "spell itinerary"))
+        self.assertEqual(result.match_data.get("word"), "itinerary")
+
+    def test_list_blacklist_is_suppression_vocab_not_slot_values(self):
+        # §6.1 suppression phrases ride in a LIST-valued "blacklist" and are
+        # not per-slot exclusions
+        msg = make_template_message(["spell {word}"], intent_name="Spell")
+        msg.data["blacklist"] = ["never mind"]
+        self.plugin.handle_register_template(msg)
+        result = self.plugin.transform(match("m2v_skill:Spell", "spell it"))
+        self.assertEqual(result.match_data.get("word"), "it")
+
+    def test_blacklist_is_per_language(self):
+        en = make_message(["spell {word}"], name="spell_skill:Spell")
+        en.data["slot_blacklist"] = {"word": ["it"]}
+        self.plugin.handle_register_intent(en)
+        pt = make_message(["soletra {word}"], name="spell_skill:Spell")
+        pt.data["lang"] = "pt-PT"
+        pt.data["slot_blacklist"] = {"word": ["isto"]}
+        self.plugin.handle_register_intent(pt)
+        result = self.plugin.transform(match("spell_skill:Spell", "spell it"))
+        self.assertIsNone(result.match_data.get("word"))
+
+
 if __name__ == "__main__":
     unittest.main()

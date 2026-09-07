@@ -18,6 +18,10 @@ class KeywordTemplateMatcher(IntentTransformer):
     def __init__(self, config=None):
         super().__init__("keyword-templates", 1, config)
         self.matchers = {}
+        # OVOS-INTENT-2 §4.3 per-slot value exclusions, keyed by
+        # (lang, match_type) so one language's blacklist never stands in for
+        # another's (pronoun sets are language specific).
+        self.slot_blacklists = {}
 
     def bind(self, bus):
         super().bind(bus)
@@ -78,9 +82,25 @@ class KeywordTemplateMatcher(IntentTransformer):
 
         return lang, skill_id, name, samples, blacklisted_words
 
-    def _register(self, lang: str, match_type: str, samples: list):
+    @staticmethod
+    def _slot_blacklist(data: dict) -> dict:
+        """OVOS-INTENT-2 §4.3 per-slot value exclusions carried by a
+        registration payload, keyed by slot name. A list-valued ``blacklist``
+        is the §6.1 suppression vocabulary and is not a slot blacklist."""
+        blacklist = data.get("slot_blacklist")
+        if blacklist is None and isinstance(data.get("blacklist"), dict):
+            blacklist = data["blacklist"]
+        if not blacklist:
+            return {}
+        return {slot.lower(): [str(v) for v in values]
+                for slot, values in blacklist.items()}
+
+    def _register(self, lang: str, match_type: str, samples: list,
+                  slot_blacklist: dict = None):
         if not samples:
             return
+        if slot_blacklist:
+            self.slot_blacklists[(lang, match_type)] = slot_blacklist
         if lang not in self.matchers:
             self.matchers[lang] = {}
         if match_type not in self.matchers[lang]:
@@ -92,14 +112,16 @@ class KeywordTemplateMatcher(IntentTransformer):
         # legacy padatious topic, match_type is the bare intent_name
         # (padatious matches are looked up by that same name)
         lang, _, intent_name, samples, _ = self._unpack_object(message)
-        self._register(lang, intent_name, samples)
+        self._register(lang, intent_name, samples,
+                       self._slot_blacklist(message.data))
 
     def handle_register_template(self, message: Message):
         # OVOS-INTENT-4 §6 spec topic, match_type follows m2v's
         # "skill_id:intent_name" IntentHandlerMatch.match_type convention
         lang, skill_id, intent_name, samples, _ = self._unpack_object(
             message, name_key='intent_name', blacklist_key='blacklist')
-        self._register(lang, f"{skill_id}:{intent_name}", samples)
+        self._register(lang, f"{skill_id}:{intent_name}", samples,
+                       self._slot_blacklist(message.data))
 
     def transform(self, intent: IntentHandlerMatch) -> IntentHandlerMatch:
         """
@@ -112,6 +134,32 @@ class KeywordTemplateMatcher(IntentTransformer):
             if intent.match_type in matchers:
                 entities = matchers[intent.match_type].match(intent.utterance)
                 LOG.debug(f"{intent.match_type} keyword templates match: {entities}")
+                entities = self._drop_blacklisted(
+                    entities, sess.lang, intent.match_type)
                 if entities:
                     intent.match_data.update(entities)
         return intent
+
+    def _drop_blacklisted(self, entities: dict, lang: str,
+                          match_type: str) -> dict:
+        """OVOS-INTENT-2 §4.3 — a slot the utterance filled with a blacklisted
+        value stays unresolved, so the extracted value is discarded instead of
+        overwriting what the matching engine deliberately left empty.
+
+        Exclusion is by WHOLE value: a bare anaphoric "it" is dropped, while a
+        longer value that merely contains a blacklisted word ("the it crowd")
+        is a legitimate binding.
+        """
+        blacklist = self.slot_blacklists.get((lang, match_type))
+        if not blacklist:
+            return entities
+        kept = {}
+        for slot, value in entities.items():
+            values = blacklist.get(slot.lower(), [])
+            if any(v.lower().split() == str(value).lower().split()
+                   for v in values):
+                LOG.debug(f"slot {slot!r}={value!r} blacklisted for "
+                          f"{match_type} ({lang}); leaving it unresolved")
+                continue
+            kept[slot] = value
+        return kept
