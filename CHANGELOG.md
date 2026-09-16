@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a1) (2026-09-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.7a2...0.1.8a1)
+
+**Merged pull requests:**
+
+- fix: keep exact template matches regardless of literal similarity [\#29](https://github.com/OpenVoiceOS/kw-template-matcher/pull/29) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.7a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.7a2) (2026-09-07)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.7a1...0.1.7a2)
