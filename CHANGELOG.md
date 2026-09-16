@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8a3](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a3) (2026-09-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a2...0.1.8a3)
+
+**Merged pull requests:**
+
+- docs: fix wrong score example and threshold demo that no longer excludes the match [\#31](https://github.com/OpenVoiceOS/kw-template-matcher/pull/31) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.8a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a2) (2026-09-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a1...0.1.8a2)
