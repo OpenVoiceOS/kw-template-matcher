@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a2) (2026-09-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a1...0.1.8a2)
+
+**Merged pull requests:**
+
+- ci: canary the redistribution guard against a real wheel build [\#36](https://github.com/OpenVoiceOS/kw-template-matcher/pull/36) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.8a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a1) (2026-09-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.7a2...0.1.8a1)
