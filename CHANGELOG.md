@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8a4](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a4) (2026-09-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a3...0.1.8a4)
+
+**Merged pull requests:**
+
+- docs: fix broken match\(\)/predict\(\) example, default threshold rejects it [\#30](https://github.com/OpenVoiceOS/kw-template-matcher/pull/30) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.1.8a3](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a3) (2026-09-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a2...0.1.8a3)
