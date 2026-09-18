@@ -8,14 +8,17 @@
    (return a dict, possibly empty) for the template to be a candidate. This
    step extracts the slot values. Every candidate is an exact structural
    match: each literal token of the template is present in the query.
-2. **Rank.** The score is the number of literal (non-slot) tokens in the
-   template, as a float. When several templates match the same query, the one
-   that pins down more of the utterance in literal words ranks first.
+2. **Rank.** The score is the share of the query's tokens that the template
+   pins down as literal (non-slot) words, in `[0.0, 1.0]`. When several
+   templates match the same query, the one that pins down more of the
+   utterance in literal words ranks first.
 
-The score is a count of the template's own literal tokens. The length of a
-captured span does not change it: `"set a timer for {duration}"` scores
-`4.0` whatever fills `{duration}`. Scores rank competing templates against
-each other. They are not a confidence value and not a similarity.
+The numerator is the count of the template's own literal tokens, the
+denominator is the token count of the query. A longer captured span lowers
+the score: `"set a timer for {duration}"` scores `4/6` for
+`"set a timer for five minutes"` and `4/7` for `"set a timer for twenty five
+minutes"`. Scores rank competing templates against each other for one query.
+They are not a similarity.
 
 ```python
 from kw_template_matcher import TemplateMatcher
@@ -24,20 +27,16 @@ matcher = TemplateMatcher()
 matcher.add_templates(["set a timer for {duration}"])
 for score, slots in matcher.predict("set a timer for five minutes"):
     print(score, slots)
-# 4.0 {'duration': 'five minutes'}
+# 0.6666666666666666 {'duration': 'five minutes'}
 ```
 
 ## The threshold argument
 
-`match` and `predict` accept `threshold` for backwards compatibility and
-ignore it. Earlier releases compared a similarity score against it and
-dropped correct extractions when the slot value was long relative to the
-template. A structural match is exact, so there is nothing to filter.
-
-```python
-matcher.predict("set a timer for five minutes", threshold=0.7)
-# [(4.0, {'duration': 'five minutes'})]  -- same as with no threshold
-```
+`threshold` is deprecated. `match` and `predict` accept it, raise a
+`DeprecationWarning` and ignore it. Earlier releases compared a similarity
+score against it and dropped correct extractions when the slot value was long
+relative to the template. A structural match is exact, so there is nothing
+to filter.
 
 ## Slot-signature routing
 

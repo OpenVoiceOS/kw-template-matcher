@@ -124,9 +124,13 @@ class KeywordTemplateMatcher(IntentTransformer):
                        self._slot_blacklist(message.data))
 
     def transform(self, intent: IntentHandlerMatch) -> IntentHandlerMatch:
-        """
-        Optionally transform intent handler data
-        e.g. NER could be performed here by modifying intent.match_data
+        """Fill the slots the registered templates extract from the utterance.
+
+        OVOS-TRANSFORM-1 §3.4: "A transformer MAY add entries to
+        ``Match.slots``. It SHOULD NOT delete or overwrite slot entries
+        produced by the matching engine or by an earlier transformer in the
+        chain". A slot the engine already set keeps the engine's value. A
+        slot set to None is unresolved and takes the template value.
         """
         sess = intent.updated_session or SessionManager.get()
         matchers = self.matchers.get(sess.lang)
@@ -136,8 +140,9 @@ class KeywordTemplateMatcher(IntentTransformer):
                 LOG.debug(f"{intent.match_type} keyword templates match: {entities}")
                 entities = self._drop_blacklisted(
                     entities, sess.lang, intent.match_type)
-                if entities:
-                    intent.match_data.update(entities)
+                for slot, value in entities.items():
+                    if intent.match_data.get(slot) is None:
+                        intent.match_data[slot] = value
         return intent
 
     def _drop_blacklisted(self, entities: dict, lang: str,

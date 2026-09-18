@@ -76,3 +76,37 @@ class TestTransformFillsLongSlotValue(unittest.TestCase):
         )
         result = plugin.transform(intent)
         self.assertEqual(result.match_data, {"query": "the beatles"})
+
+
+class TestPredictScoreIsAFraction(unittest.TestCase):
+    """predict() returns a score in [0, 1]: the share of the utterance's
+    tokens that the template pins down as literals. The ranking is the
+    same as the literal count, since every candidate shares the query."""
+
+    def test_score_is_in_unit_interval(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates(["play {query}", "play {query} on {device}"])
+        results = matcher.predict("play jazz on spotify")
+        self.assertEqual([s for s, _ in results], [0.5, 0.25])
+        for score, _ in results:
+            self.assertGreaterEqual(score, 0.0)
+            self.assertLessEqual(score, 1.0)
+
+    def test_score_is_bounded_by_one(self):
+        # a template with one slot and every other query token literal
+        matcher = TemplateMatcher()
+        matcher.add_templates(["turn on the {thing}"])
+        self.assertEqual(matcher.predict("turn on the lights"),
+                         [(0.75, {"thing": "lights"})])
+
+    def test_threshold_is_gone(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates(["play {query}"])
+        with self.assertWarns(DeprecationWarning):
+            results = matcher.predict("play a very long slot value here",
+                                      threshold=0.9)
+        # a threshold no longer drops a structurally exact match
+        self.assertEqual(results[0][1], {"query": "a very long slot value here"})
+        with self.assertWarns(DeprecationWarning):
+            self.assertEqual(matcher.match("play x", threshold=0.9),
+                             {"query": "x"})

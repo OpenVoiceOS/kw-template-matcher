@@ -1,4 +1,4 @@
-"""Example — rank candidate matches by literal token count with predict().
+"""Example — rank candidate matches by the share of the query the template pins down with predict().
 
 Run::
 
