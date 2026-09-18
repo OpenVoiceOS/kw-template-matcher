@@ -1,8 +1,9 @@
 import itertools
 import re
+import warnings
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Dict, Tuple
+from typing import List, Dict, Optional, Tuple
 
 from simplematch import match as sm
 
@@ -32,40 +33,47 @@ class TemplateMatcher:
                 if t not in self.templates[key]:
                     self.templates[key].append(t)
 
-    def match(self, query: str, threshold: float = 0.4) -> Dict[str, str]:
-        """
-        Matches the input query to a template.
+    def match(self, query: str, threshold: Optional[float] = None) -> Dict[str, str]:
+        """Return the slots of the best template match, or ``{}``.
 
         Args:
             query (str): The input query.
-
-        Returns:
-            List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
+            threshold: deprecated and ignored. See ``predict``.
         """
         preds = [m[1] for m in self.predict(query, threshold)]
         if preds:
             return preds[0]
         return {}
 
-    def predict(self, query: str, threshold: float = 0.4) -> List[Tuple[float, Dict[str, str]]]:
-        """
-        Matches the input query to a template.
+    def predict(self, query: str, threshold: Optional[float] = None) -> List[Tuple[float, Dict[str, str]]]:
+        """Return every template match as ``(score, slots)``, best first.
 
-        `threshold` is kept for backwards compatibility but no longer filters matches:
-        every template match returned by `simplematch` is structurally exact, so it is
-        always accepted regardless of the literal/utterance length ratio. When multiple
-        templates match, the one with more literal tokens wins the tie-break even if that
-        means a shared leading article ends up on the wrong side of the split: with both
-        `'play {query}'` and `'play the {thing}'` registered, `"play the beatles"` is
-        matched by the latter and returns `{"thing": "beatles"}`, not `{"query": "the
-        beatles"}`.
+        Every match `simplematch` returns is structurally exact: each literal
+        token of the template is in the query. The score is the share of the
+        query's tokens the template pins down as literals, in [0, 1]. When several
+        templates match, the one with more literal tokens ranks first, even
+        if that puts a shared leading article on the wrong side of the
+        split: with `'play {query}'` and `'play the {thing}'` registered,
+        `"play the beatles"` returns `{"thing": "beatles"}` first, not
+        `{"query": "the beatles"}`.
+
+        `threshold` is deprecated and ignored. It used to compare the
+        template literal against the whole utterance and dropped correct
+        matches whenever the slot value was long. Passing it raises a
+        DeprecationWarning.
 
         Args:
             query (str): The input query.
 
         Returns:
-            List[Dict[str, str]]: A list of matched slot dictionaries sorted by confidence score.
+            List[Tuple[float, Dict[str, str]]]: (score, slots) pairs, sorted by
+            score, highest first.
         """
+        if threshold is not None:
+            warnings.warn("TemplateMatcher.predict/match: 'threshold' is "
+                          "deprecated and ignored; every match is structurally "
+                          "exact", DeprecationWarning, stacklevel=2)
+        query_tokens = max(1, len(query.split()))
 
         def match_template(ent_templates: Tuple[str, List[str]]) -> List[Tuple[float, Dict[str, str]]]:
             ent, templates = ent_templates
@@ -84,7 +92,7 @@ class TemplateMatcher:
                     # words is the more specific/confident match.
                     tokens = t.split()
                     literal_tokens = sum(1 for tok in tokens if not re.fullmatch(r"\{\w+\}", tok))
-                    result.append((float(literal_tokens), m))
+                    result.append((min(1.0, literal_tokens / query_tokens), m))
             return result
 
         with ThreadPoolExecutor() as executor:

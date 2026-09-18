@@ -62,8 +62,8 @@ Want the scores too?
 ```python
 for score, slots in matcher.predict("my name is Alice and I am from The United Kingdom"):
     print(score, slots)
-# 7.0 {'name': 'Alice', 'location': 'The United Kingdom'}
-# 3.0 {'name': 'Alice and I am from The United Kingdom'}
+# 0.6363636363636364 {'name': 'Alice', 'location': 'The United Kingdom'}
+# 0.2727272727272727 {'name': 'Alice and I am from The United Kingdom'}
 ```
 
 ## Filling slots with values

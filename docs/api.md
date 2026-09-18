@@ -77,7 +77,7 @@ matcher.add_templates([
 ])
 ```
 
-### `match(query: str, threshold: float = 0.4) -> dict[str, str]`
+### `match(query: str) -> dict[str, str]`
 
 Returns the slot dict of the single highest-scoring template, or `{}` if no
 template matches.
@@ -87,28 +87,28 @@ matcher.match("play jazz in kitchen")
 # {'query': 'jazz', 'device_name': 'kitchen'}
 ```
 
-`threshold` is accepted for backwards compatibility and ignored. It does not
-filter the result.
+`threshold` is deprecated. A call that passes it gets a `DeprecationWarning`
+and the value is ignored. It does not filter the result.
 
-### `predict(query: str, threshold: float = 0.4) -> list[tuple[float, dict[str, str]]]`
+### `predict(query: str) -> list[tuple[float, dict[str, str]]]`
 
 Returns every template that structurally matches (via `simplematch`), as
 `(score, slots)` tuples sorted by descending score. `match` is
 `predict(...)[0][1]` when the list is not empty.
 
-- **score**: the number of literal (non-slot) tokens in the expanded template
-  that matched, as a float. A template that pins down more of the utterance in
-  literal words ranks higher. It is a count, not a similarity, and it is not
-  bounded to `[0.0, 1.0]`.
-- **threshold**: accepted for backwards compatibility and ignored. Every
+- **score**: the share of the query's tokens that the expanded template pins
+  down as literal (non-slot) words, in `[0.0, 1.0]`. A template that pins
+  down more of the utterance ranks higher. Every candidate for one query
+  shares the denominator, so the order is the order of the literal counts.
+- **threshold**: deprecated and ignored, with a `DeprecationWarning`. Every
   structural match is exact, so nothing is filtered.
 
 ```python
 for score, slots in matcher.predict("play jazz in kitchen"):
     print(score, slots)
-# 2.0 {'query': 'jazz', 'device_name': 'kitchen'}
-# 2.0 {'query': 'jazz', 'zone_name': 'kitchen'}
-# 1.0 {'query': 'jazz in kitchen'}
+# 0.5 {'query': 'jazz', 'device_name': 'kitchen'}
+# 0.5 {'query': 'jazz', 'zone_name': 'kitchen'}
+# 0.25 {'query': 'jazz in kitchen'}
 ```
 
 A query that fills no slot structurally returns `[]` from `predict` and `{}`

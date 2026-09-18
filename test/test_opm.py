@@ -256,3 +256,38 @@ class TestSlotBlacklist(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTransformKeepsEngineSlots(unittest.TestCase):
+    """OVOS-TRANSFORM-1 §3.4: "A transformer MAY add entries to
+    ``Match.slots``. It SHOULD NOT delete or overwrite slot entries
+    produced by the matching engine or by an earlier transformer in the
+    chain". transform() adds the slots the template extracted and leaves
+    every slot the engine already set."""
+
+    def setUp(self):
+        self.plugin = KeywordTemplateMatcher()
+        self.plugin.handle_register_template(make_template_message(
+            ["play {query}", "play the {thing}"]))
+
+    def test_engine_slot_is_not_overwritten(self):
+        intent = match("m2v_skill:demo.intent", "play the beatles")
+        # the engine split the utterance its own way
+        intent.match_data["thing"] = "the beatles"
+        self.plugin.transform(intent)
+        self.assertEqual(intent.match_data["thing"], "the beatles")
+
+    def test_absent_slot_is_added(self):
+        intent = match("m2v_skill:demo.intent", "play the beatles")
+        intent.match_data["engine_only"] = "kept"
+        self.plugin.transform(intent)
+        self.assertEqual(intent.match_data["thing"], "beatles")
+        self.assertEqual(intent.match_data["engine_only"], "kept")
+
+    def test_engine_value_none_is_not_a_slot(self):
+        # an explicit None from the engine is an unresolved slot; the
+        # template value fills it
+        intent = match("m2v_skill:demo.intent", "play the beatles")
+        intent.match_data["thing"] = None
+        self.plugin.transform(intent)
+        self.assertEqual(intent.match_data["thing"], "beatles")
