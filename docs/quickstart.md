@@ -11,9 +11,9 @@ for dozens of phrasings that you do not have to write out.
 pip install keyword-template-matcher
 ```
 
-Two runtime dependencies pull in: [`rapidfuzz`](https://github.com/maxbachmann/RapidFuzz)
-for the similarity score and [`simplematch`](https://github.com/OpenVoiceOS/simplematch)
-for slot extraction. Both are pure leaf installs.
+The matcher itself pulls in one runtime dependency,
+[`simplematch`](https://github.com/OpenVoiceOS/simplematch), for slot
+extraction.
 
 ## The one idea
 
@@ -61,8 +61,9 @@ Want the scores too?
 
 ```python
 for score, slots in matcher.predict("my name is Alice and I am from The United Kingdom"):
-    print(round(score, 3), slots)
-# 0.592 {'name': 'Alice', 'location': 'The United Kingdom'}
+    print(score, slots)
+# 7.0 {'name': 'Alice', 'location': 'The United Kingdom'}
+# 3.0 {'name': 'Alice and I am from The United Kingdom'}
 ```
 
 ## Filling slots with values

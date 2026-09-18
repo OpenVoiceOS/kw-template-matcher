@@ -9,7 +9,7 @@ from simplematch import match as sm
 
 class TemplateMatcher:
     """
-    Matches text to predefined templates using slot filling and fuzzy matching.
+    Matches text to predefined templates using slot filling and exact structural matching.
     """
 
     def __init__(self):
@@ -79,7 +79,7 @@ class TemplateMatcher:
                     # was comparing the raw template literal (e.g. "play {query}") against the
                     # whole utterance and dropping correct extractions whenever the slot value
                     # was long relative to the template. When several templates match the same
-                    # query, rank them by the fraction of literal (non-slot) tokens they
+                    # query, rank them by the count of literal (non-slot) tokens they
                     # contain: the template that pins down more of the utterance in literal
                     # words is the more specific/confident match.
                     tokens = t.split()

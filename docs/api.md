@@ -80,32 +80,35 @@ matcher.add_templates([
 ### `match(query: str, threshold: float = 0.4) -> dict[str, str]`
 
 Returns the slot dict of the single highest-scoring template, or `{}` if no
-template clears the threshold.
+template matches.
 
 ```python
-matcher.match("play jazz in kitchen", threshold=0.3)
+matcher.match("play jazz in kitchen")
 # {'query': 'jazz', 'device_name': 'kitchen'}
 ```
 
-The default `threshold=0.4` is stricter than this example's own similarity score, so this
-call must lower it. Passing no `threshold` override here returns `{}`.
+`threshold` is accepted for backwards compatibility and ignored. It does not
+filter the result.
 
 ### `predict(query: str, threshold: float = 0.4) -> list[tuple[float, dict[str, str]]]`
 
-Returns every template that structurally matches (via `simplematch`) and
-scores at or above `threshold`, as `(score, slots)` tuples sorted by
-descending score. `match` is `predict(...)[0][1]` when the list is not empty.
+Returns every template that structurally matches (via `simplematch`), as
+`(score, slots)` tuples sorted by descending score. `match` is
+`predict(...)[0][1]` when the list is not empty.
 
-- **score**: `rapidfuzz` normalized Damerau-Levenshtein similarity between the
-  template string and the query, in `[0.0, 1.0]`. Longer literal overlap and
-  fewer edits score higher.
-- **threshold**: minimum score to keep a candidate. Default `0.4`.
+- **score**: the number of literal (non-slot) tokens in the expanded template
+  that matched, as a float. A template that pins down more of the utterance in
+  literal words ranks higher. It is a count, not a similarity, and it is not
+  bounded to `[0.0, 1.0]`.
+- **threshold**: accepted for backwards compatibility and ignored. Every
+  structural match is exact, so nothing is filtered.
 
 ```python
-for score, slots in matcher.predict("play jazz in kitchen", threshold=0.3):
-    print(round(score, 3), slots)
-# 0.379 {'query': 'jazz', 'device_name': 'kitchen'}
-# 0.37 {'query': 'jazz', 'zone_name': 'kitchen'}
+for score, slots in matcher.predict("play jazz in kitchen"):
+    print(score, slots)
+# 2.0 {'query': 'jazz', 'device_name': 'kitchen'}
+# 2.0 {'query': 'jazz', 'zone_name': 'kitchen'}
+# 1.0 {'query': 'jazz in kitchen'}
 ```
 
 A query that fills no slot structurally returns `[]` from `predict` and `{}`
