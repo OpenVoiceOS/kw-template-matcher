@@ -6,7 +6,7 @@ from ovos_plugin_manager.templates.pipeline import IntentHandlerMatch
 from ovos_plugin_manager.templates.transformers import IntentTransformer
 from ovos_spec_tools.expansion import expand
 from ovos_spec_tools.messages import SpecMessage
-from ovos_utils.lang import standardize_lang_tag
+from ovos_spec_tools import standardize_lang
 from ovos_utils.list_utils import deduplicate_list, flatten_list
 from ovos_utils.log import LOG
 from typing import Union
@@ -38,7 +38,7 @@ class KeywordTemplateMatcher(IntentTransformer):
         if not skill_id:
             skill_id = "anonymous_skill"
         lang = message.data.get('lang') or sess.lang
-        lang = standardize_lang_tag(lang)
+        lang = standardize_lang(lang)
 
         # intent specific
         file_name = message.data.get('file_name')

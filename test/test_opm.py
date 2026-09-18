@@ -291,3 +291,19 @@ class TestTransformKeepsEngineSlots(unittest.TestCase):
         intent.match_data["thing"] = None
         self.plugin.transform(intent)
         self.assertEqual(intent.match_data["thing"], "beatles")
+
+
+class TestNoDeprecatedCalls(unittest.TestCase):
+    def test_registration_logs_no_deprecation(self):
+        """The plugin calls no deprecated ovos-utils helper on the
+        registration path (standardize_lang_tag was one)."""
+        import warnings
+        plugin = KeywordTemplateMatcher()
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            plugin.handle_register_intent(make_message(["play {media}"]))
+        deprecations = [str(w.message) for w in caught
+                        if issubclass(w.category, DeprecationWarning)
+                        and "deprecated;" in str(w.message)]
+        self.assertEqual(deprecations, [])
+        self.assertIn("en-US", plugin.matchers)
