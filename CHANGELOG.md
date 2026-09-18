@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8a5](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a5) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a4...0.1.8a5)
+
+**Merged pull requests:**
+
+- docs: predict\(\) returns a literal token count, threshold is ignored, rapidfuzz is gone [\#42](https://github.com/OpenVoiceOS/kw-template-matcher/pull/42) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.8a4](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a4) (2026-09-17)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a3...0.1.8a4)
