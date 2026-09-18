@@ -2,19 +2,23 @@
 
 ## How a match is scored
 
-`predict` does two things per registered template:
+`predict` does two things for each expanded template.
 
-1. **Structural match** — `simplematch.match(template, query)`. This must
-   succeed (return a dict, possibly empty) for the template to be a candidate at
-   all. It is what extracts the slot values.
-2. **Similarity score** — `rapidfuzz` normalized Damerau-Levenshtein similarity
-   between the *template string* (slots and all) and the query. The closer the
-   query's surface form is to the template, the higher the score.
+1. **Structural match.** `simplematch.match(template, query)` must succeed
+   (return a dict, possibly empty) for the template to be a candidate. This
+   step extracts the slot values. Every candidate is an exact structural
+   match: each literal token of the template is present in the query.
+2. **Rank.** The score is the share of the query's tokens that the template
+   pins down as literal (non-slot) words, in `[0.0, 1.0]`. When several
+   templates match the same query, the one that pins down more of the
+   utterance in literal words ranks first.
 
-Because the score compares against the template *including* the literal `{slot}`
-markers, long captured spans pull the score down — the literal `{query}` is
-shorter than the text that fills it. This is expected: scores are a relative
-ranking signal across competing templates, not an absolute confidence.
+The numerator is the count of the template's own literal tokens, the
+denominator is the token count of the query. A longer captured span lowers
+the score: `"set a timer for {duration}"` scores `4/6` for
+`"set a timer for five minutes"` and `4/7` for `"set a timer for twenty five
+minutes"`. Scores rank competing templates against each other for one query.
+They are not a similarity.
 
 ```python
 from kw_template_matcher import TemplateMatcher
@@ -22,36 +26,35 @@ from kw_template_matcher import TemplateMatcher
 matcher = TemplateMatcher()
 matcher.add_templates(["set a timer for {duration}"])
 for score, slots in matcher.predict("set a timer for five minutes"):
-    print(round(score, 3), slots)
-# 0.5 {'duration': 'five minutes'}
+    print(score, slots)
+# 0.6666666666666666 {'duration': 'five minutes'}
 ```
 
-## Tuning the threshold
+## The threshold argument
 
-The default `0.4` is permissive. Raise it when you want only near-literal
-phrasings to match; lower it to tolerate longer slot fills and looser wording.
-
-```python
-matcher.predict("set a timer for five minutes", threshold=0.6)  # likely []
-matcher.predict("set a timer for five minutes", threshold=0.2)  # keeps the match
-```
+`threshold` is deprecated. `match` and `predict` accept it, raise a
+`DeprecationWarning` and ignore it. Earlier releases compared a similarity
+score against it and dropped correct extractions when the slot value was long
+relative to the template. A structural match is exact, so there is nothing
+to filter.
 
 ## Slot-signature routing
 
-Templates are bucketed by their sorted slot names (`"device|query"`), and each
-bucket is matched in its own thread. Two templates that capture the *same* set of
-slot names compete directly; templates with different slot sets are matched
-independently and all surviving candidates are merged, then sorted by score.
+The matcher buckets templates by their sorted slot names (`"device|query"`).
+It matches each bucket in its own thread. Two templates that capture the same
+set of slot names compete directly. Templates with different slot sets are
+matched independently, then all surviving candidates are merged and sorted by
+score.
 
-A practical consequence: register related phrasings together and let `predict`
-rank them, rather than trying to hand-order templates.
+As a result, register related phrasings together and let `predict` rank them.
+Do not hand-order templates.
 
 ## Optional groups that wrap slots
 
-`[in ({device_name}|{zone_name})]` expands to one branch with no slot and several
-branches with one slot each. The slot-free branch (`play {query}`) is kept by
-`add_templates` only because it still has the `{query}` slot; a branch with *no*
-slot at all is silently dropped at registration.
+`[in ({device_name}|{zone_name})]` expands to one branch with no slot and
+several branches with one slot each. `add_templates` keeps the slot-free
+branch (`play {query}`) only because it still has the `{query}` slot. A
+branch with no slot at all is dropped at registration.
 
 ```python
 from kw_template_matcher import expand_template
@@ -80,20 +83,19 @@ utterances = expand_slots(
 
 ## Gotchas
 
-- **Whitespace in expansions.** A `[the ]` optional leaves a clean single space
-  when present and collapses when absent, but constructs like `do( the | )thing`
-  can leave the spacing baked into the alternatives — design templates so each
-  branch reads naturally.
-- **Slot-free templates vanish.** Anything without a `{slot}` is not registered.
-  Use `expand_template` directly if you want the slot-free sentences.
-- **Empty-string branch.** A fully optional template (`[(this|that) is optional]`)
-  includes `''` among its expansions; it is dropped by the matcher but appears
-  from `expand_template`.
-- **Scores are comparative.** Do not threshold on an absolute notion of
-  confidence across unrelated templates; calibrate per template family.
+- **Whitespace in expansions.** A `[the ]` optional leaves a clean single
+  space when present and collapses when absent. A construct like
+  `do( the | )thing` can bake uneven spacing into the alternatives. Design
+  each branch so it reads naturally.
+- **Slot-free templates vanish.** The matcher does not register anything
+  without a `{slot}`. Call `expand_template` directly to get the slot-free
+  sentences.
+- **Empty-string branch.** A fully optional template
+  (`[(this|that) is optional]`) includes `''` among its expansions. The
+  matcher drops this branch, but `expand_template` still returns it.
+- **Scores are comparative.** A score is a literal token count. Compare it
+  between templates that matched one query. Do not read it as a confidence
+  value across unrelated templates.
 
-## Where next
-
-- [api.md](api.md) — exact signatures and return shapes
-- [quickstart.md](quickstart.md) — the core idea in one page
-- [opm-plugin.md](opm-plugin.md) — wiring the matcher into OVOS intent handling
+---
+[← API reference](api.md) · [Home](../README.md) · [OVOS plugin →](opm-plugin.md)

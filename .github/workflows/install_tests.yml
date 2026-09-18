@@ -28,7 +28,7 @@ jobs:
           sudo apt install python3-dev swig libssl-dev
       - name: Build Distribution Packages
         run: |
-          python setup.py bdist_wheel
+          python -m build --wheel
       - name: Install package
         run: |
           pip install .[all]

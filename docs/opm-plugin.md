@@ -1,15 +1,15 @@
 # OVOS plugin
 
 `kw_template_matcher.opm.KeywordTemplateMatcher` is an OVOS `IntentTransformer`
-that runs `TemplateMatcher` as a named-entity step inside the intent pipeline. It
-adds slot values to a matched intent's `match_data` without owning intent
-selection itself.
+that runs `TemplateMatcher` as a named-entity step inside the intent pipeline.
+It adds slot values to a matched intent's `match_data`. It does not own
+intent selection.
 
-It is published under the entry-point group **`opm.transformer.intent`** as
-`ovos-keyword-template-matcher`, so an OVOS install discovers it automatically.
+It is published under the entry-point group `opm.transformer.intent` as
+`ovos-keyword-template-matcher`. An OVOS install discovers it automatically.
 
-The plugin imports `ovos-bus-client`, `ovos-plugin-manager`, and `ovos-utils`,
-which come from the host OVOS environment rather than this package's runtime
+The plugin imports `ovos-bus-client`, `ovos-plugin-manager`, and `ovos-utils`.
+These come from the host OVOS environment, not from this package's runtime
 dependencies.
 
 ## What it does
@@ -25,7 +25,7 @@ intent it:
 
 1. reads `samples` (or reads them from `file_name`),
 2. expands every sample with `ovos_utils.bracket_expansion.expand_template`,
-3. keeps only expansions containing a `{slot}` — pure keyword extractors,
+3. keeps only expansions containing a `{slot}`, the pure keyword extractors,
 4. builds a `TemplateMatcher` per `(lang, intent_name)` and feeds it those
    samples.
 
@@ -50,12 +50,9 @@ template matcher, with no extra model.
 
 ## Using the core matcher directly
 
-You do not need OVOS to use the matching logic — that is plain
-`TemplateMatcher`. Reach for the plugin only when you want this behaviour wired
-into a running OVOS intent pipeline; otherwise see [quickstart.md](quickstart.md).
+You do not need OVOS to use the matching logic. That is plain
+`TemplateMatcher`. Use the plugin only when you want this behavior wired into
+a running OVOS intent pipeline. Otherwise, see [quickstart.md](quickstart.md).
 
-## Where next
-
-- [quickstart.md](quickstart.md) — the standalone matcher
-- [api.md](api.md) — `TemplateMatcher` signatures
-- [advanced.md](advanced.md) — scoring and routing internals
+---
+[← Advanced](advanced.md) · [Home](../README.md)
