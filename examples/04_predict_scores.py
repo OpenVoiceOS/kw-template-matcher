@@ -1,4 +1,4 @@
-"""Example — rank candidate matches by similarity score with predict().
+"""Example — rank candidate matches by literal token count with predict().
 
 Run::
 
@@ -19,7 +19,7 @@ def main() -> None:
     print("query:", query)
     print("ranked candidates (score, slots):")
     for score, slots in matcher.predict(query):
-        print("   ", round(score, 3), slots)
+        print("   ", score, slots)
 
 
 if __name__ == "__main__":

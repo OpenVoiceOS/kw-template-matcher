@@ -2,21 +2,20 @@
 
 ## How a match is scored
 
-`predict` does two things for each registered template.
+`predict` does two things for each expanded template.
 
 1. **Structural match.** `simplematch.match(template, query)` must succeed
    (return a dict, possibly empty) for the template to be a candidate. This
-   step extracts the slot values.
-2. **Similarity score.** `rapidfuzz` computes the normalized
-   Damerau-Levenshtein similarity between the template string (slots and all)
-   and the query. The closer the query's surface form is to the template, the
-   higher the score.
+   step extracts the slot values. Every candidate is an exact structural
+   match: each literal token of the template is present in the query.
+2. **Rank.** The score is the number of literal (non-slot) tokens in the
+   template, as a float. When several templates match the same query, the one
+   that pins down more of the utterance in literal words ranks first.
 
-The score compares against the template, including the literal `{slot}`
-markers. A long captured span pulls the score down, because the literal
-`{query}` is shorter than the text that fills it. This is expected. Scores
-rank competing templates against each other. They are not an absolute
-confidence value.
+The score is a count of the template's own literal tokens. The length of a
+captured span does not change it: `"set a timer for {duration}"` scores
+`4.0` whatever fills `{duration}`. Scores rank competing templates against
+each other. They are not a confidence value and not a similarity.
 
 ```python
 from kw_template_matcher import TemplateMatcher
@@ -24,18 +23,20 @@ from kw_template_matcher import TemplateMatcher
 matcher = TemplateMatcher()
 matcher.add_templates(["set a timer for {duration}"])
 for score, slots in matcher.predict("set a timer for five minutes"):
-    print(round(score, 3), slots)
-# 0.607 {'duration': 'five minutes'}
+    print(score, slots)
+# 4.0 {'duration': 'five minutes'}
 ```
 
-## Tuning the threshold
+## The threshold argument
 
-The default `0.4` is permissive. Raise it to match only near-literal
-phrasings. Lower it to allow longer slot fills and looser wording.
+`match` and `predict` accept `threshold` for backwards compatibility and
+ignore it. Earlier releases compared a similarity score against it and
+dropped correct extractions when the slot value was long relative to the
+template. A structural match is exact, so there is nothing to filter.
 
 ```python
-matcher.predict("set a timer for five minutes", threshold=0.7)  # []
-matcher.predict("set a timer for five minutes", threshold=0.2)  # keeps the match
+matcher.predict("set a timer for five minutes", threshold=0.7)
+# [(4.0, {'duration': 'five minutes'})]  -- same as with no threshold
 ```
 
 ## Slot-signature routing
@@ -93,9 +94,9 @@ utterances = expand_slots(
 - **Empty-string branch.** A fully optional template
   (`[(this|that) is optional]`) includes `''` among its expansions. The
   matcher drops this branch, but `expand_template` still returns it.
-- **Scores are comparative.** Do not set a threshold as an absolute
-  confidence value across unrelated templates. Calibrate the threshold per
-  template family.
+- **Scores are comparative.** A score is a literal token count. Compare it
+  between templates that matched one query. Do not read it as a confidence
+  value across unrelated templates.
 
 ---
 [← API reference](api.md) · [Home](../README.md) · [OVOS plugin →](opm-plugin.md)

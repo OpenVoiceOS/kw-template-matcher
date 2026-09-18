@@ -15,9 +15,9 @@ assistants, or rule-based query matching.
     - Alternatives (`(choice1|choice2)`)
     - Slots (`{slot_name}`)
 - Slot substitution from a supplied dictionary
-- Fuzzy matching and confidence scoring with `rapidfuzz`
+- Exact structural matching with `simplematch`, ranked by literal token count
 - A simple template structure that extends to any language or grammar rule
-- Built-in integration with `simplematch` for fuzzy slot matching
+- Built-in integration with `simplematch` for slot extraction
 
 ## Installation
 
@@ -108,5 +108,4 @@ Open an issue or submit a pull request to report a bug or propose an improvement
 
 ## Acknowledgements
 
-- [`rapidfuzz`](https://github.com/maxbachmann/RapidFuzz) for fast fuzzy matching
 - [`simplematch`](https://github.com/OpenVoiceOS/simplematch) for lightweight template parsing
