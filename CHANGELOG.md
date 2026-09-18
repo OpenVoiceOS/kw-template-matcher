@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.9a1) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a5...0.1.9a1)
+
+**Merged pull requests:**
+
+- fix: transform\(\) keeps engine slots; predict\(\) scores in \[0, 1\] again [\#44](https://github.com/OpenVoiceOS/kw-template-matcher/pull/44) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.8a5](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.8a5) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a4...0.1.8a5)
