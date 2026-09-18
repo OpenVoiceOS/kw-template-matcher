@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.10a1) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.9a1...0.1.10a1)
+
+**Merged pull requests:**
+
+- fix: import standardize\_lang from ovos-spec-tools [\#45](https://github.com/OpenVoiceOS/kw-template-matcher/pull/45) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.9a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.9a1) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.8a5...0.1.9a1)
