@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.10a2) (2026-09-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.10a1...0.1.10a2)
+
+**Merged pull requests:**
+
+- Update actions/setup-python action to v7 [\#19](https://github.com/OpenVoiceOS/kw-template-matcher/pull/19) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [0.1.10a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.10a1) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.9a1...0.1.10a1)
