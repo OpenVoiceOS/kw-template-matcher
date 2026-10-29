@@ -49,11 +49,14 @@ class TemplateMatcher:
         """Return every template match as ``(score, slots)``, best first.
 
         Every match `simplematch` returns is structurally exact: each literal
-        token of the template is in the query. The score is the share of the
-        query's tokens the template pins down as literals, in [0, 1]. When several
-        templates match, the one with more literal tokens ranks first, even
-        if that puts a shared leading article on the wrong side of the
-        split: with `'play {query}'` and `'play the {thing}'` registered,
+        token of the template is in the query. Literal tokens compare without
+        regard to letter case: OVOS-INTENT-1 §2 has templates in lowercase,
+        and the default utterance chain does not lowercase ASR text. A slot
+        value keeps the letter case of the query. The score is the share of
+        the query's tokens the template pins down as literals, in [0, 1].
+        When several templates match, the one with more literal tokens ranks
+        first, even if that puts a shared leading article on the wrong side
+        of the split: with `'play {query}'` and `'play the {thing}'` registered,
         `"play the beatles"` returns `{"thing": "beatles"}` first, not
         `{"query": "the beatles"}`.
 
@@ -79,7 +82,7 @@ class TemplateMatcher:
             ent, templates = ent_templates
             result = []
             for t in templates:
-                m = sm(t, query)
+                m = sm(t, query, case_sensitive=False)
                 if m:
                     # `sm` only returns a hit for a structurally exact match (every literal
                     # token in the template is present in the query), so this is never a
