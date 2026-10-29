@@ -4,10 +4,13 @@
 
 `predict` does two things for each expanded template.
 
-1. **Structural match.** `simplematch.match(template, query)` must succeed
-   (return a dict, possibly empty) for the template to be a candidate. This
-   step extracts the slot values. Every candidate is an exact structural
-   match: each literal token of the template is present in the query.
+1. **Structural match.** `simplematch.match(template, query,
+   case_sensitive=False)` must succeed (return a dict, possibly empty) for
+   the template to be a candidate. This step extracts the slot values. Every
+   candidate is an exact structural match: each literal token of the
+   template is present in the query. Letter case does not count, so
+   `"Play The Beatles"` matches `"play {query}"`. The slot value keeps the
+   letter case of the query: `{"query": "The Beatles"}`.
 2. **Rank.** The score is the share of the query's tokens that the template
    pins down as literal (non-slot) words, in `[0.0, 1.0]`. When several
    templates match the same query, the one that pins down more of the

@@ -110,3 +110,52 @@ class TestPredictScoreIsAFraction(unittest.TestCase):
         with self.assertWarns(DeprecationWarning):
             self.assertEqual(matcher.match("play x", threshold=0.9),
                              {"query": "x"})
+
+
+class TestLetterCase(unittest.TestCase):
+    """OVOS-INTENT-1 §2 has input templates authored in lowercase, while the
+    default utterance chain does not lowercase ASR text. A capital letter in
+    a literal word of the utterance must not stop the template from binding
+    its slots, and the slot keeps the letter case the user's text has."""
+
+    TEMPLATE = "what should (i|we) watch if (i|we) liked {movie}"
+
+    def test_capitalised_literal_word_still_binds_slot(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates([self.TEMPLATE])
+        self.assertEqual(
+            matcher.match("what should I watch if I liked Titanic"),
+            {"movie": "Titanic"})
+
+    def test_sentence_case_utterance_binds_slot(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates(["play {query}"])
+        self.assertEqual(matcher.match("Play The Beatles"),
+                         {"query": "The Beatles"})
+
+    def test_lowercase_utterance_is_unchanged(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates([self.TEMPLATE])
+        self.assertEqual(
+            matcher.match("what should we watch if we liked jaws"),
+            {"movie": "jaws"})
+
+    def test_different_literal_word_still_does_not_match(self):
+        matcher = TemplateMatcher()
+        matcher.add_templates([self.TEMPLATE])
+        self.assertEqual(
+            matcher.match("what should I watch if I hated Titanic"), {})
+
+    def test_transform_fills_slot_from_mixed_case_utterance(self):
+        plugin = KeywordTemplateMatcher()
+        plugin.handle_register_template(Message(
+            "ovos.intent.register.template",
+            data={"intent_name": "movie_recommendations",
+                  "samples": [self.TEMPLATE],
+                  "lang": "en-US", "skill_id": "test_skill"}))
+        intent = IntentHandlerMatch(
+            match_type="test_skill:movie_recommendations", match_data={},
+            skill_id="test_skill",
+            utterance="what should I watch if I liked Titanic")
+        self.assertEqual(plugin.transform(intent).match_data,
+                         {"movie": "Titanic"})
