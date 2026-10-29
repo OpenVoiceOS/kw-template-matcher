@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11a1](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.11a1) (2026-10-29)
+
+[Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.10a2...0.1.11a1)
+
+**Merged pull requests:**
+
+- fix: match template literal words without regard to letter case [\#49](https://github.com/OpenVoiceOS/kw-template-matcher/pull/49) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.1.10a2](https://github.com/OpenVoiceOS/kw-template-matcher/tree/0.1.10a2) (2026-09-26)
 
 [Full Changelog](https://github.com/OpenVoiceOS/kw-template-matcher/compare/0.1.10a1...0.1.10a2)
